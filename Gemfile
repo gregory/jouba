@@ -3,6 +3,10 @@ source "http://rubygems.org"
 # Example:
 #   gem "activesupport", ">= 2.3.5"
 
+gem 'wisper', '~>1.3.0'
+gem 'hashie', '~>2.0.5'
+gem 'activesupport', '~>3.2.18'
+gem 'wisper', '~>1.3.0'
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
 group :development do
