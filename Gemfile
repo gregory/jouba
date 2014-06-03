@@ -4,7 +4,7 @@ source "http://rubygems.org"
 #   gem "activesupport", ">= 2.3.5"
 
 gem 'wisper', '~>1.3.0'
-gem 'hashie', '~>2.0.5'
+gem 'hashie', '~>2.1.1'
 gem 'activesupport', '~>3.2.18'
 gem 'wisper', '~>1.3.0'
 # Add dependencies to develop your gem here.

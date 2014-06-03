@@ -21,7 +21,7 @@ GEM
       multi_json (>= 1.7.5, < 2.0)
       nokogiri (~> 1.6.0)
       oauth2
-    hashie (2.0.5)
+    hashie (2.1.1)
     highline (1.6.21)
     i18n (0.6.9)
     jeweler (2.0.1)
@@ -86,7 +86,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport (~> 3.2.18)
   bundler (~> 1.0)
-  hashie (~> 2.0.5)
+  hashie (~> 2.1.1)
   jeweler (~> 2.0.1)
   rdoc (~> 3.12)
   reek (~> 1.2.8)
