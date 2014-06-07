@@ -2,8 +2,8 @@ module Jouba
   module Data
     module Mongoid
       class Event
-        include Mongoid::Document
-        include Mongoid::Timestamps
+        include ::Mongoid::Document
+        include ::Mongoid::Timestamps
 
         store_in collection: 'events'
 

@@ -3,9 +3,9 @@ module Jouba
     module Mongoid
       class Snapshot
         MAX_VERSIONS = 5
-        include Mongoid::Document
-        include Mongoid::Timestamps
-        include Mongoid::Versioning
+        include ::Mongoid::Document
+        include ::Mongoid::Timestamps
+        include ::Mongoid::Versioning
 
         store_in collection: 'snapshots'
 

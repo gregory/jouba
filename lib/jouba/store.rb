@@ -22,12 +22,20 @@ module Jouba
       end
     end
 
+    def self.event_store
+      Data::Mongoid::Event
+    end
+
     def self.find_events_with_criteria(criteria)
-      Data::Event.find_events_with_criteria(criteria)
+      self.event_store.find_events_with_criteria(criteria)
+    end
+
+    def self.snapshot_store
+      Data::Mongoid::Snapshot
     end
 
     def self.find_snapshot_with_criteria(criteria)
-      Data::Snapshot.find_snapshot_with_criteria(criteria)
+      self.snapshot_store.find_snapshot_with_criteria(criteria)
     end
 
     def self.rebuild_aggregate(aggregate, events)
@@ -52,11 +60,15 @@ module Jouba
 
     def self.documents_to_events(documents)
       return documents_to_events([documents]) unless documents.is_a? Array
-      documents.map{ |doc| Event.new(doc.to_hash) }
+      documents.map{ |doc| event_from_document(doc) }
+    end
+
+    def self.event_from_document(doc)
+      Event.new doc.to_hash
     end
 
     def self.events_to_hash(events)
-      events_to_hash([events]) unless events.is_a? Array
+      return events_to_hash([events]) unless events.is_a? Array
 
       events.map{ |event| { name: event.name, data: event.data } }
     end
