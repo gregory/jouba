@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "jouba"
   gem.homepage = "http://github.com/gregory/jouba"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Jouba is a tool set for event sourcing: aggregate root, entities and storage}
+  gem.description = gem.summary
   gem.email = "greg2502@gmail.com"
   gem.authors = ["gregory"]
   # dependencies defined in Gemfile
