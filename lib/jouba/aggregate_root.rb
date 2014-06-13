@@ -2,7 +2,6 @@ module Jouba
   module AggregateRoot
     def self.included(klass)
       klass.send :include, Entity
-      klass.attribute :aggregate_id, String, default: ->(aggregate, attribute){ SecureRandom.uuid.gsub('-', '') }
     end
 
     def clear_raised_events
