@@ -52,7 +52,7 @@ module Jouba
     private
 
     def apply_event(event)
-      method(:"on_#{event.to_s}").call(*event.data)
+      method(:"#{event.to_s}").call(*event.data)
     end
 
     def contain_raised_event(raised_event)
@@ -66,7 +66,7 @@ module Jouba
     alias :on_create :on_update_attributes
 
     def persist_raised_events
-      EventStore.new.save(self, raised_events)
+      Store.new.save(self, raised_events)
     end
 
     def publish_raised_event(raised_event)
