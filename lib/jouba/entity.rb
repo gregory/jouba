@@ -1,8 +1,7 @@
-module Es
+module Jouba
   module Entity
     def self.included(klass)
-      klass.send :include, Virtus.model
-      #klass.send :include, ActiveModel::Serialization
+      klass.send :include, ActiveModel::Validations
       klass.send :include, Wisper::Publisher
       original_initialize = klass.instance_method(:initialize)
       klass.send :define_method, :initialize do |*args, &block|
