@@ -1,23 +1,28 @@
 module Jouba
   module Data
     module Mongoid
-      class Event
-        include ::Mongoid::Document
-        include ::Mongoid::Timestamps
+      module Event
+        def self.included(klass)
+          klass.send :include, ::Mongoid::Document
+          klass.send :include, ::Mongoid::Timestamps
+          klass.store_in collection: 'events'
 
-        store_in collection: 'events'
+          klass.field :at, as: :aggregate_type, type: String
+          klass.field :aid, as: :aggregate_id, type: String
+          klass.field :n, as: :name, type: String
+          klass.field :d, as: :data, type: Hash
+          klass.field :i, as: :seq_num, type: ::BSON::ObjectId, default: ->{ ::BSON::ObjectId.new }
 
-        field :at, as: :aggregate_type, type: String
-        field :aid, as: :aggregate_id, type: String
-        field :n, as: :name, type: String
-        field :d, as: :data, type: Hash
-        field :i, as: :seq_num, type: Moped::BSON::ObjectId, default: ->{ Moped::BSON::ObjectId.new }
+          klass.scope :for_aggregate, ->(aid){ where(aggregate_id: aid) }
+          klass.scope :after_seq_num, ->(seq_num){ where(:seq_num.gt => seq_num) }
 
-        scope :for_aggregate, ->(aid){ where(aggregate_id: aid) }
-        scope :after_seq_num, ->(seq_num){ where(:seq_num.gt => seq_num) }
+          klass.extend ClassMethods
+        end
 
-        def self.find_events_with_criteria(criteria)
-          self.order_by(:seq_num => :asc).where(criteria).to_a
+        module ClassMethods
+          def find_events_with_criteria(criteria)
+            order_by(:seq_num => :asc).where(criteria).to_a
+          end
         end
       end
     end
