@@ -13,11 +13,4 @@ module Jouba
   def configure
     @config = Configuration.new.tap{ |configuration| yield(configuration) }
   end
-
-  def use(store)
-    if store == :mongo
-      Data::Event.send :include, Data::Mongoid::Event
-      Data::Snapshot.send :include, Data::Mongoid::Snapshot
-    end
-  end
 end
