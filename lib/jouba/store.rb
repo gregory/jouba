@@ -2,6 +2,7 @@ module Jouba
   class Store
     SNAPSHOT_IF_BUILD_X_EVENTS = 5
     SNAPSHOT_IF_SAVE_X_EVENTS  = 5
+
     def self.find(criteria)
       criteria = criteria.is_a?(String) ? {aggregate_id: criteria} : criteria
 
@@ -23,7 +24,7 @@ module Jouba
     end
 
     def self.event_store
-      Data::Mongoid::Event
+      Jouba.config.event_store
     end
 
     def self.find_events_with_criteria(criteria)
@@ -31,7 +32,7 @@ module Jouba
     end
 
     def self.snapshot_store
-      Data::Mongoid::Snapshot
+      Jouba.config.snapshot_store
     end
 
     def self.find_snapshot_with_criteria(criteria)
@@ -50,7 +51,7 @@ module Jouba
     def self.take_snapshot(aggregate, last_event)
       aggregate_snapshot = JSON.parse aggregate.to_json #NOTE: Hack to get all the object's properti>
       aggregate_id = aggregate_snapshot.delete("aggregate_id")
-      snapshot = Data::Snapshot.find_or_initialize_by({aggregate_id: aggregate_id})
+      snapshot = snapshot_store.find_or_initialize_by({aggregate_id: aggregate_id})
 
       snapshot.aggregate_type = last_event.aggregate_type
       snapshot.event_seq_num  = last_event.seq_num
@@ -82,7 +83,7 @@ module Jouba
     private
 
     def create_event(event)
-      Data::Event.create(event.to_hash)
+      event_store.create(event.to_hash)
     end
   end
 end
