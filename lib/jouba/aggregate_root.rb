@@ -41,11 +41,15 @@ module Jouba
     end
 
     def create(params)
-      raise_event :create, {aggregate_id: self.aggregate_id}.merge(params)
+      raise_event :on_create, {aggregate_id: self.aggregate_id}.merge(params)
     end
 
     def update_attributes(params)
-      raise_event :update_attributes, params
+      raise_event :on_update_attributes, params
+    end
+
+    def storage
+      Jouba.config.storage_engine
     end
 
     private
@@ -59,13 +63,12 @@ module Jouba
     end
 
     def on_update_attributes(params)
-      puts "----> Updating: #{params}"
       self.attributes = params
     end
     alias :on_create :on_update_attributes
 
     def persist_raised_events
-      Store.new.save(self, raised_events)
+      storage.save(self, raised_events)
     end
 
     def publish_raised_event(raised_event)
