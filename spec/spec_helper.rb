@@ -27,4 +27,8 @@ Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
 
 RSpec.configure do |config|
   Mongoid.load!(File.expand_path(File.join(File.dirname(__FILE__),  'mongoid.yml')), 'test')
+
+  Jouba.configure do |config|
+    config.storage_strategy = :mongoid
+  end
 end

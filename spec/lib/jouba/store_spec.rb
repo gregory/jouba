@@ -9,14 +9,14 @@ describe Jouba::Store do
     let(:aggregate){ double(:aggregate) }
 
     before do
-      subject.should_receive(:rebuild_aggregate).with(aggregate, events)
+      expect(subject).to receive(:rebuild_aggregate).with(aggregate, events)
     end
 
     context 'when criteria is a hash' do
       let(:criteria){ { foo: 'bar' } }
 
       it 'find and rebuild the aggregate' do
-        subject.should_receive(:find_events_and_aggregate_with_criteria).with(criteria).and_return([events, aggregate])
+        expect(subject).to receive(:find_events_and_aggregate_with_criteria).with(criteria).and_return([events, aggregate])
         subject.find(criteria)
       end
     end
@@ -25,7 +25,7 @@ describe Jouba::Store do
       let(:criteria){ 'bar' }
 
       it 'find and rebuild the aggregate' do
-        subject.should_receive(:find_events_and_aggregate_with_criteria).with({ aggregate_id: criteria }).and_return([events, aggregate])
+        expect(subject).to receive(:find_events_and_aggregate_with_criteria).with({ aggregate_id: criteria }).and_return([events, aggregate])
         subject.find(criteria)
       end
     end
@@ -36,7 +36,7 @@ describe Jouba::Store do
     let(:criteria){ { foo: 'bar' } }
 
     before do
-      subject.should_receive(:find_snapshot_with_criteria).with(criteria).and_return(snapshot)
+      expect(subject).to receive(:find_snapshot_with_criteria).with(criteria).and_return(snapshot)
     end
 
     context 'when snapshot is not nil' do
@@ -45,12 +45,12 @@ describe Jouba::Store do
       let(:model){ double(:model) }
 
       before do
-        snapshot.should_receive(:last_events).and_return(last_events)
-        snapshot.should_receive(:to_model).and_return(model)
+        expect(snapshot).to receive(:last_events).and_return(last_events)
+        expect(snapshot).to receive(:to_model).and_return(model)
       end
 
       it 'returns the last event and the model' do
-        subject.find_events_and_aggregate_with_criteria(criteria).should eq [last_events, model]
+        expect(subject.find_events_and_aggregate_with_criteria(criteria)).to eq [last_events, model]
       end
     end
 
@@ -59,7 +59,7 @@ describe Jouba::Store do
       let(:model){ double(:model) }
 
       before do
-        subject.should_receive(:find_events_with_criteria).with(criteria).and_return(events)
+        allow(subject).to receive(:find_events_with_criteria).with(criteria){ events }
       end
 
       context 'when events is empty' do
@@ -74,11 +74,11 @@ describe Jouba::Store do
         let(:events){ [event] }
 
         before do
-          event.should_receive(:to_model).and_return(model)
+          expect(event).to receive(:to_model).and_return(model)
         end
 
         it 'return the last event and his model' do
-          subject.find_events_and_aggregate_with_criteria(criteria).should eq [events, model]
+          expect(subject.find_events_and_aggregate_with_criteria(criteria)).to eq [events, model]
         end
       end
     end
@@ -92,9 +92,9 @@ describe Jouba::Store do
     let(:criteria){ { foo: 'bqr' } }
     let(:event_store){ double(:event_store) }
 
-    before{ described_class.stub(:event_store).and_return( event_store) }
+    before{ allow(described_class).to receive(:event_store).and_return( event_store) }
     it 'return the events related to criteria' do
-      event_store.should_receive(:find_events_with_criteria).with(criteria)
+      expect(event_store).to receive(:find_events_with_criteria).with(criteria)
       described_class.find_events_with_criteria(criteria)
     end
   end
@@ -103,9 +103,9 @@ describe Jouba::Store do
     let(:criteria){ { foo: 'bqr' } }
     let(:snapshot_store){ double(:snapshot_store) }
 
-    before{ subject.stub(:snapshot_store).and_return( snapshot_store) }
+    before{ allow(subject).to receive(:snapshot_store).and_return( snapshot_store) }
     it 'return the snapshot related to criteria' do
-      snapshot_store.should_receive(:find_snapshot_with_criteria).with(criteria)
+      expect(snapshot_store).to receive(:find_snapshot_with_criteria).with(criteria)
       subject.find_snapshot_with_criteria(criteria)
     end
   end
@@ -134,11 +134,11 @@ describe Jouba::Store do
 
     before do
       events.each_with_index do |e, i|
-        e.should_receive(:to_hash).and_return(hash_of_events[i])
+        expect(e).to receive(:to_hash).and_return(hash_of_events[i])
       end
     end
     it 'return a hash for each event' do
-      described_class.documents_to_events(events).should eq hash_of_events
+      expect(described_class.documents_to_events(events)).to eq hash_of_events
     end
   end
 end
