@@ -32,7 +32,6 @@ describe Jouba::Store do
   end
 
   describe '.find_events_and_aggregate_with_criteria(criteria)' do
-    #subject{ described_class.find_events_and_aggregate_with_criteria(criteria) }
     let(:criteria){ { foo: 'bar' } }
 
     before do
@@ -87,8 +86,8 @@ describe Jouba::Store do
   describe '.rebuild_aggregate(aggregate, events)' do
   end
 
-
   describe '.find_events_with_criteria(criteria)' do
+    #TODO: integration test
     let(:criteria){ { foo: 'bqr' } }
     let(:event_store){ double(:event_store) }
 
@@ -100,6 +99,7 @@ describe Jouba::Store do
   end
 
   describe '.find_snapshot_with_criteria(criteria)' do
+    #TODO: integration test
     let(:criteria){ { foo: 'bqr' } }
     let(:snapshot_store){ double(:snapshot_store) }
 
@@ -111,6 +111,10 @@ describe Jouba::Store do
   end
 
   describe '.rebuild_aggregate(aggregate, events)' do
+    #integration test
+  end
+
+  describe '.event_from_document(doc)' do
     #integration test
   end
 
