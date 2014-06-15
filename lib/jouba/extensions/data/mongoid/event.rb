@@ -11,7 +11,7 @@ module Jouba
             klass.field :at, as: :aggregate_type, type: String
             klass.field :aid, as: :aggregate_id, type: String
             klass.field :n, as: :name, type: String
-            klass.field :d, as: :data, type: Hash
+            klass.field :d, as: :data, type: Array
             klass.field :i, as: :seq_num, type: ::BSON::ObjectId, default: ->{ ::BSON::ObjectId.new }
 
             klass.scope :for_aggregate, ->(aid){ where(aggregate_id: aid) }

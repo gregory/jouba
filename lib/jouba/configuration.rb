@@ -2,6 +2,15 @@ require 'ostruct'
 module Jouba
   class Configuration
     attr_accessor :event_store, :snapshot_store, :storage_strategy, :storage_engine
+    attr_accessor :snapshot_if_save_x_events, :snapshot_if_build_x_events
+
+    def snapshot_if_build_x_events
+      @snapshot_if_build_x_events || 5
+    end
+
+    def snapshot_if_save_x_events
+      @snapshot_if_save_x_events || 5
+    end
 
     def storate_strategy
       @storage_strategy || (raise NotImplementedError.new("Please set a storage_strategy first ex: :mongoid"))

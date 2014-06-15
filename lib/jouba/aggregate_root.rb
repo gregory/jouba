@@ -49,7 +49,7 @@ module Jouba
     end
 
     def storage
-      Jouba.config.storage_engine
+      Jouba.storage_engine
     end
 
     private

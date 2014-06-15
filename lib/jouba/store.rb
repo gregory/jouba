@@ -1,14 +1,19 @@
 module Jouba
   class Store
-    SNAPSHOT_IF_BUILD_X_EVENTS = 5
-    SNAPSHOT_IF_SAVE_X_EVENTS  = 5
-
     def self.find(criteria)
       criteria = criteria.is_a?(String) ? {aggregate_id: criteria} : criteria
 
       events, aggregate = find_events_and_aggregate_with_criteria(criteria)
 
       rebuild_aggregate(aggregate, events)
+    end
+
+    def self.find_snapshot_with_criteria(criteria)
+      self.snapshot_store.find_snapshot_with_criteria(criteria)
+    end
+
+    def self.find_events_with_criteria(criteria)
+      self.event_store.find_events_with_criteria(criteria)
     end
 
     def self.find_events_and_aggregate_with_criteria(criteria)
@@ -23,28 +28,13 @@ module Jouba
       end
     end
 
-    def self.event_store
-      Jouba.config.event_store
-    end
-
-    def self.find_events_with_criteria(criteria)
-      self.event_store.find_events_with_criteria(criteria)
-    end
-
-    def self.snapshot_store
-      Jouba.config.snapshot_store
-    end
-
-    def self.find_snapshot_with_criteria(criteria)
-      self.snapshot_store.find_snapshot_with_criteria(criteria)
-    end
 
     def self.rebuild_aggregate(aggregate, events)
       return self.rebuild_aggregate(aggregate, [events]) unless events.is_a? Array
 
       e = documents_to_events(events)
       aggregate.replay_events(e)
-      take_snapshot(aggregate, events.last) if events.size > SNAPSHOT_IF_BUILD_X_EVENTS
+      take_snapshot(aggregate, events.last) if events.size > Jouba.config.snapshot_if_build_x_events
       aggregate
     end
 
@@ -76,14 +66,22 @@ module Jouba
 
     def save(aggregate, raised_events)
       last_raised_event = raised_events.map{ |event| create_event(event) }.last
-      self.class.take_snapshot(aggregate, last_raised_event) if raised_events.size > SNAPSHOT_IF_SAV>
+      self.class.take_snapshot(aggregate, last_raised_event) if raised_events.size > Jouba.config.snapshot_if_save_x_events
       aggregate
     end
 
     private
 
+    def self.event_store
+      Jouba.event_store
+    end
+
+    def self.snapshot_store
+      Jouba.snapshot_store
+    end
+
     def create_event(event)
-      event_store.create(event.to_hash)
+      self.class.event_store.create(event)
     end
   end
 end
