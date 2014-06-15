@@ -15,7 +15,7 @@ gem 'mongoid-versioning', github: 'simi/mongoid-versioning'
 # Include everything needed to run rake, tests, features, etc.
 group :development do
   gem 'pry'
-  gem "rspec", "~> 2.8.0"
+  gem "rspec", "~> 2.14.0"
   gem "rdoc", "~> 3.12"
   gem "bundler", "~> 1.0"
   gem "jeweler"
