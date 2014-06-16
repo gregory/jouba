@@ -11,5 +11,9 @@ module Jouba
     end
 
     def after_initialize; end
+
+    def self.generate_aggregate_id
+      SecureRandom.uuid
+    end
   end
 end
