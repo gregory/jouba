@@ -1,4 +1,4 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe "Jouba" do
+describe 'Jouba' do
 end

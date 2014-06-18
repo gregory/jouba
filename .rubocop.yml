@@ -1,5 +1,8 @@
-AllCops:
-  Documentation:
-    Enabled: false #dont require classes to be documented
-  Encoding:
-    Enabled: false #dont need to always require encoding
+Style/LineLength:
+  Max: 120
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/Encoding:
+  Enabled: false
