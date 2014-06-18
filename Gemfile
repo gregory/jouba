@@ -20,5 +20,5 @@ group :development do
   gem "bundler", "~> 1.0"
   gem "jeweler"
   gem "simplecov", ">= 0"
-  gem "reek", "~> 1.2.8"
+  gem 'rubocop', '~> 0.23.0'
 end
