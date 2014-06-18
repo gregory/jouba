@@ -1,7 +1,22 @@
 module Jouba
   module AggregateRoot
+    EVENTS = {
+      invalid: :invalid,
+      saved: :saved
+    }
     def self.included(klass)
       klass.send :include, Entity
+      klass.extend ClassMethods
+    end
+
+    module ClassMethods
+      def publishable_events
+        EVENTS.merge(local_publishable_events)
+      end
+
+      def local_publishable_events
+        {}
+      end
     end
 
     def clear_raised_events
@@ -34,18 +49,18 @@ module Jouba
     end
 
     def save(options={})
-      publish_raised_events
-      publish(:save, options) && persist_raised_events
-      clear_raised_events
+      if valid?
+        publish_raised_events
+        publish(self.class.publishable_events[:saved], options) && persist_raised_events
+        clear_raised_events
+      else
+        publish(self.class.publishable_events[:invalid], errors)
+      end
       self
     end
 
     def create(params)
-      raise_event :on_create, {aggregate_id: self.aggregate_id}.merge(params)
-    end
-
-    def update_attributes(params)
-      raise_event :on_update_attributes, params
+      raise_event :on_create, {aggregate_id: aggregate_id}.merge(params)
     end
 
     def storage
@@ -59,13 +74,8 @@ module Jouba
     end
 
     def contain_raised_event(raised_event)
-      self.raised_events.push  raised_event
+      raised_events.push  raised_event
     end
-
-    def on_update_attributes(params)
-      self.attributes = params
-    end
-    alias :on_create :on_update_attributes
 
     def persist_raised_events
       storage.save(self, raised_events)
