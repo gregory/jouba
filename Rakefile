@@ -37,14 +37,10 @@ task :simplecov do
   Rake::Task['spec'].execute
 end
 
-require 'reek/rake/task'
-Reek::Rake::Task.new do |t|
-  t.fail_on_error = true
-  t.verbose = false
-  t.source_files = 'lib/**/*.rb'
-end
+require 'rubocop/rake_task'
+RuboCop::RakeTask.new(:rubocop)
 
-task :default => :spec
+task :default => [:rubocop, :spec]
 
 require 'rdoc/task'
 Rake::RDocTask.new do |rdoc|
@@ -55,3 +51,4 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
+

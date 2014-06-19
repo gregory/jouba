@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["gregory"]
-  s.date = "2014-06-11"
+  s.date = "2014-06-18"
   s.description = "Jouba is a tool set for event sourcing: aggregate root, entities and storage"
   s.email = "greg2502@gmail.com"
   s.extra_rdoc_files = [
@@ -28,18 +28,23 @@ Gem::Specification.new do |s|
     "jouba.gemspec",
     "lib/jouba.rb",
     "lib/jouba/aggregate_root.rb",
+    "lib/jouba/configuration.rb",
+    "lib/jouba/data.rb",
     "lib/jouba/data/event.rb",
     "lib/jouba/data/snapshot.rb",
     "lib/jouba/entity.rb",
     "lib/jouba/event.rb",
     "lib/jouba/exceptions.rb",
+    "lib/jouba/extensions/data/event.rb",
     "lib/jouba/extensions/data/mongoid/event.rb",
     "lib/jouba/extensions/data/mongoid/snapshot.rb",
     "lib/jouba/extensions/data/service/.gitkeep",
+    "lib/jouba/extensions/data/snapshot.rb",
     "lib/jouba/store.rb",
     "lib/jouba/version.rb",
     "spec/jouba_spec.rb",
     "spec/lib/jouba/store_spec.rb",
+    "spec/mongoid.yml",
     "spec/spec_helper.rb"
   ]
   s.homepage = "http://github.com/gregory/jouba"
@@ -53,53 +58,50 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<wisper>, ["~> 1.3.0"])
-      s.add_runtime_dependency(%q<hashie>, ["~> 2.1.1"])
+      s.add_runtime_dependency(%q<hashie>, [">= 0"])
       s.add_runtime_dependency(%q<activesupport>, ["= 4.0.3"])
       s.add_runtime_dependency(%q<wisper>, ["~> 1.3.0"])
       s.add_runtime_dependency(%q<mongoid>, ["~> 4.0.0.rc1"])
-      s.add_runtime_dependency(%q<virtus>, [">= 0"])
       s.add_runtime_dependency(%q<activemodel>, [">= 0"])
       s.add_runtime_dependency(%q<mongoid-versioning>, [">= 0"])
       s.add_development_dependency(%q<pry>, [">= 0"])
-      s.add_development_dependency(%q<rspec>, ["~> 2.8.0"])
+      s.add_development_dependency(%q<rspec>, ["~> 2.14.0"])
       s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0"])
       s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<simplecov>, [">= 0"])
-      s.add_development_dependency(%q<reek>, ["~> 1.2.8"])
+      s.add_development_dependency(%q<rubocop>, ["~> 0.23.0"])
     else
       s.add_dependency(%q<wisper>, ["~> 1.3.0"])
-      s.add_dependency(%q<hashie>, ["~> 2.1.1"])
+      s.add_dependency(%q<hashie>, [">= 0"])
       s.add_dependency(%q<activesupport>, ["= 4.0.3"])
       s.add_dependency(%q<wisper>, ["~> 1.3.0"])
       s.add_dependency(%q<mongoid>, ["~> 4.0.0.rc1"])
-      s.add_dependency(%q<virtus>, [">= 0"])
       s.add_dependency(%q<activemodel>, [">= 0"])
       s.add_dependency(%q<mongoid-versioning>, [">= 0"])
       s.add_dependency(%q<pry>, [">= 0"])
-      s.add_dependency(%q<rspec>, ["~> 2.8.0"])
+      s.add_dependency(%q<rspec>, ["~> 2.14.0"])
       s.add_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_dependency(%q<bundler>, ["~> 1.0"])
       s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<simplecov>, [">= 0"])
-      s.add_dependency(%q<reek>, ["~> 1.2.8"])
+      s.add_dependency(%q<rubocop>, ["~> 0.23.0"])
     end
   else
     s.add_dependency(%q<wisper>, ["~> 1.3.0"])
-    s.add_dependency(%q<hashie>, ["~> 2.1.1"])
+    s.add_dependency(%q<hashie>, [">= 0"])
     s.add_dependency(%q<activesupport>, ["= 4.0.3"])
     s.add_dependency(%q<wisper>, ["~> 1.3.0"])
     s.add_dependency(%q<mongoid>, ["~> 4.0.0.rc1"])
-    s.add_dependency(%q<virtus>, [">= 0"])
     s.add_dependency(%q<activemodel>, [">= 0"])
     s.add_dependency(%q<mongoid-versioning>, [">= 0"])
     s.add_dependency(%q<pry>, [">= 0"])
-    s.add_dependency(%q<rspec>, ["~> 2.8.0"])
+    s.add_dependency(%q<rspec>, ["~> 2.14.0"])
     s.add_dependency(%q<rdoc>, ["~> 3.12"])
     s.add_dependency(%q<bundler>, ["~> 1.0"])
     s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<simplecov>, [">= 0"])
-    s.add_dependency(%q<reek>, ["~> 1.2.8"])
+    s.add_dependency(%q<rubocop>, ["~> 0.23.0"])
   end
 end
 
