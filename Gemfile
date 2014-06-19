@@ -4,15 +4,16 @@ source "http://rubygems.org"
 #   gem "activesupport", ">= 2.3.5"
 
 gem 'wisper', '~>1.3.0'
-gem 'hashie', '~>2.1.2'
+#gem 'hashie', git: 'https://github.com/intridea/hashie.git', branch: :master
+gem 'hashie', path: '../../hashie/'
 gem 'activesupport', '4.0.3'
 gem 'wisper', '~>1.3.0'
 gem 'mongoid', '~>4.0.0.rc1'
-gem 'virtus'
 gem 'activemodel'
 gem 'mongoid-versioning', github: 'simi/mongoid-versioning'
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
+
 group :development do
   gem 'pry'
   gem "rspec", "~> 2.14.0"
