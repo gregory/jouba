@@ -1,9 +1,8 @@
-require 'virtus'
 require 'wisper'
 require 'hashie'
 require 'mongoid'
 
-Dir["#{File.dirname(__FILE__)}/jouba/**/*.rb"].each {|f| require f}
+Dir["#{File.dirname(__FILE__)}/jouba/**/*.rb"].each { |f| require f }
 
 module Jouba
   extend Forwardable
@@ -13,10 +12,10 @@ module Jouba
   def_delegators :config, :event_store, :snapshot_store, :storage_strategy, :storage_engine
 
   def config
-    @config || raise(ArgumentError.new("Please set the config first"))
+    @config || fail(ArgumentError, 'Please set the config first')
   end
 
   def configure
-    @config = Configuration.new.tap{ |configuration| yield(configuration) }
+    @config = Configuration.new.tap { |configuration| yield(configuration) }
   end
 end
