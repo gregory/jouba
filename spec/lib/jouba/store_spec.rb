@@ -25,7 +25,7 @@ describe Jouba::Store do
     context 'when criteria is a string' do
       let(:criteria) { 'bar' }
 
-      it 'find and rebuild the aggregate' do
+      it 'find and rebuild the aggregate by setting aggregate_id as criteria' do
         expect(subject).to receive(:find_events_and_aggregate_with_criteria)
           .with(aggregate_id: criteria).and_return([events, aggregate])
         subject.find(criteria)
@@ -41,29 +41,24 @@ describe Jouba::Store do
     end
 
     context 'when snapshot is not nil' do
-      let(:snapshot) { double(:snapshot) }
       let(:last_events) { [double(:event)] }
       let(:model) { double(:model) }
-
-      before do
-        expect(snapshot).to receive(:last_events).and_return(last_events)
-        expect(snapshot).to receive(:to_model).and_return(model)
-      end
+      let(:snapshot) { double(:snapshot, to_model: model, last_events: last_events) }
 
       it 'returns the last event and the model' do
         expect(subject.find_events_and_aggregate_with_criteria(criteria)).to eq [last_events, model]
       end
     end
 
-    context 'when snapshot is nil' do
+    context 'when there is no snapshot' do
       let(:snapshot) { nil }
       let(:model) { double(:model) }
 
       before do
-        allow(subject).to receive(:find_events_with_criteria).with(criteria) { events }
+        expect(subject).to receive(:find_events_with_criteria).with(criteria) { events }
       end
 
-      context 'when events is empty' do
+      context 'and no events' do
         let(:events) { [] }
         it 'raise an exception' do
           expect { subject.find_events_and_aggregate_with_criteria(criteria) }
@@ -71,15 +66,11 @@ describe Jouba::Store do
         end
       end
 
-      context 'wen events are present' do
-        let(:event) { double(:event, model: model) }
+      context 'but there is events' do
+        let(:event) { double(:event, to_model: model) }
         let(:events) { [event] }
 
-        before do
-          expect(event).to receive(:to_model).and_return(model)
-        end
-
-        it 'return the last event and his model' do
+        it 'return the last events and the model' do
           expect(subject.find_events_and_aggregate_with_criteria(criteria)).to eq [events, model]
         end
       end
@@ -87,30 +78,66 @@ describe Jouba::Store do
   end
 
   describe '.rebuild_aggregate(aggregate, events)' do
+    subject { described_class.rebuild_aggregate(aggregate, events) }
+    let(:aggregate) { double(:aggregate) }
+    let(:events) { double(:events) }
+
+    before do
+      expect(described_class).to receive(:documents_to_events).and_return(events)
+      expect(aggregate).to receive(:replay_events).with(events).and_return(aggregate)
+    end
+
+    it 'build the aggregate' do
+      expect(subject).to eq aggregate
+    end
+
+    context 'when there is too much events' do
+      let(:x){ 5 }
+      let(:events){ Array.new(x){ double(:event)} }
+
+      before do
+        expect(described_class).to receive(:snapshot_if_build_x_events).and_return(x-1)
+      end
+
+      it 'takes a snapshot' do
+        expect(described_class).to receive(:take_snapshot).with(aggregate, events.last)
+        expect(subject).to eq aggregate
+      end
+    end
+  end
+
+  describe 'take_snapshot(aggregate, last_event)' do
+    let(:aggregate_id) { 'bar_id' }
+    let(:aggregate_type) { 'foo_type' }
+    let(:seq_num) { 'foo_seq_num' }
+    let(:aggregate_h) { { foo: 'barbar', bar: { foo: 'bar' } } }
+    let(:aggregate) { double(:aggregate, to_hash: aggregate_h) }
+    let(:last_event) { double(:last_event, seq_num: seq_num, aggregate_type: aggregate_type) }
+    let(:snapshot) { double(:snapshot) }
+
+    subject { described_class.take_snapshot(aggregate, last_event) }
+
+    before do
+      allow(aggregate_h).to receive(:delete).with(:aggregate_id).and_return(aggregate_id)
+      expect(described_class.snapshot_store).to respond_to(:find_or_initialize_by)
+      expect(described_class.snapshot_store).to receive(:find_or_initialize_by).with(aggregate_id: aggregate_id).and_return(snapshot)
+    end
+
+    it 'takes a snapshot' do
+      expect(snapshot).to receive(:aggregate_type=).with(aggregate_type)
+      expect(snapshot).to receive(:event_seq_num=).with(seq_num)
+      expect(snapshot).to receive(:snapshot=).with(aggregate_h)
+      expect(snapshot).to receive(:save)
+      subject
+    end
   end
 
   describe '.find_events_with_criteria(criteria)' do
     # TODO: integration test
-    let(:criteria) { { foo: 'bqr' } }
-    let(:event_store) { double(:event_store) }
-
-    before { allow(described_class).to receive(:event_store).and_return(event_store) }
-    it 'return the events related to criteria' do
-      expect(event_store).to receive(:find_events_with_criteria).with(criteria)
-      described_class.find_events_with_criteria(criteria)
-    end
   end
 
   describe '.find_snapshot_with_criteria(criteria)' do
     # TODO: integration test
-    let(:criteria) { { foo: 'bqr' } }
-    let(:snapshot_store) { double(:snapshot_store) }
-
-    before { allow(subject).to receive(:snapshot_store).and_return(snapshot_store) }
-    it 'return the snapshot related to criteria' do
-      expect(snapshot_store).to receive(:find_snapshot_with_criteria).with(criteria)
-      subject.find_snapshot_with_criteria(criteria)
-    end
   end
 
   describe '.rebuild_aggregate(aggregate, events)'
