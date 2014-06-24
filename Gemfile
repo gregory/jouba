@@ -3,7 +3,6 @@ source "http://rubygems.org"
 # Example:
 #   gem "activesupport", ">= 2.3.5"
 
-gem 'wisper', '~>1.3.0'
 #gem 'hashie', git: 'https://github.com/intridea/hashie.git', branch: :master
 gem 'hashie', path: '../../hashie/'
 gem 'activesupport', '4.0.3'

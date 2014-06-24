@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["gregory"]
-  s.date = "2014-06-18"
+  s.date = "2014-06-24"
   s.description = "Jouba is a tool set for event sourcing: aggregate root, entities and storage"
   s.email = "greg2502@gmail.com"
   s.extra_rdoc_files = [
@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.files = [
     ".document",
     ".rspec",
+    ".rubocop.yml",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",
@@ -40,6 +41,7 @@ Gem::Specification.new do |s|
     "lib/jouba/extensions/data/mongoid/snapshot.rb",
     "lib/jouba/extensions/data/service/.gitkeep",
     "lib/jouba/extensions/data/snapshot.rb",
+    "lib/jouba/extensions/hashie/entity.rb",
     "lib/jouba/store.rb",
     "lib/jouba/version.rb",
     "spec/jouba_spec.rb",
@@ -57,7 +59,6 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<wisper>, ["~> 1.3.0"])
       s.add_runtime_dependency(%q<hashie>, [">= 0"])
       s.add_runtime_dependency(%q<activesupport>, ["= 4.0.3"])
       s.add_runtime_dependency(%q<wisper>, ["~> 1.3.0"])
@@ -72,7 +73,6 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<simplecov>, [">= 0"])
       s.add_development_dependency(%q<rubocop>, ["~> 0.23.0"])
     else
-      s.add_dependency(%q<wisper>, ["~> 1.3.0"])
       s.add_dependency(%q<hashie>, [">= 0"])
       s.add_dependency(%q<activesupport>, ["= 4.0.3"])
       s.add_dependency(%q<wisper>, ["~> 1.3.0"])
@@ -88,7 +88,6 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rubocop>, ["~> 0.23.0"])
     end
   else
-    s.add_dependency(%q<wisper>, ["~> 1.3.0"])
     s.add_dependency(%q<hashie>, [">= 0"])
     s.add_dependency(%q<activesupport>, ["= 4.0.3"])
     s.add_dependency(%q<wisper>, ["~> 1.3.0"])
