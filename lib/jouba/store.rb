@@ -38,8 +38,8 @@ module Jouba
     end
 
     def self.take_snapshot(aggregate, last_event)
-      aggregate_snapshot = JSON.parse aggregate.to_json # NOTE: Hack to get all the object's properties
-      aggregate_id = aggregate_snapshot.delete('aggregate_id')
+      aggregate_snapshot = aggregate.to_hash
+      aggregate_id = aggregate_snapshot.delete(:aggregate_id)
       snapshot = snapshot_store.find_or_initialize_by(aggregate_id: aggregate_id)
 
       snapshot.aggregate_type = last_event.aggregate_type
@@ -88,7 +88,7 @@ module Jouba
     end
 
     def create_event(event)
-      Store.event_store.create(event)
+      Store.event_store.create(event.to_hash)
     end
   end
 end

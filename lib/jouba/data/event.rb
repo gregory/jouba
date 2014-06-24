@@ -11,7 +11,7 @@ module Jouba
           name:           self.name,
           aggregate_type: self.aggregate_type,
           aggregate_id:   self.aggregate_id,
-          data:           self.data.map{|d| d.is_a?(Hash) ? ActiveSupport::HashWithIndifferentAccess.new(d) : d }
+          data:           self.data
         }
       end
     end

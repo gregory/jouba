@@ -31,7 +31,15 @@ module Jouba
       raised_event.aggregate_id = self.aggregate_id
 
       contain_raised_event raised_event
-      self
+      raise ArgumentError.new(self.errors) unless valid?
+      publish_raised_events
+    end
+
+    def raise_event!(name, *attributes)
+      raise_event(name, attributes)
+    ensure
+      persist_raised_events
+      clear_raised_events
     end
 
     def publish_raised_events
@@ -49,14 +57,15 @@ module Jouba
     end
 
     def save(options={})
-      if valid?
-        publish_raised_events
-        publish(self.class.publishable_events[:saved], options) && persist_raised_events
-        clear_raised_events
-      else
-        publish(self.class.publishable_events[:invalid], errors)
-      end
+      publish_raised_events
+    rescue Exception => e
+      publish(:failed, e)
+    else
+      publish(self.class.publishable_events[:saved], self)
       self
+    ensure
+      persist_raised_events
+      clear_raised_events
     end
 
     def create(params)
@@ -82,7 +91,7 @@ module Jouba
     end
 
     def publish_raised_event(raised_event)
-      method(:publish).call(raised_event.name, *raised_event.data)
+      publish(raised_event.name, *raised_event.data)
     end
   end
 end

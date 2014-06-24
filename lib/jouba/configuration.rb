@@ -1,7 +1,7 @@
 require 'ostruct'
 module Jouba
   class Configuration
-    attr_accessor :event_store, :snapshot_store, :storage_strategy, :storage_engine
+    attr_accessor :event_store, :snapshot_store, :storage_strategy, :storage_engine, :default_listeners
     attr_accessor :snapshot_if_save_x_events, :snapshot_if_build_x_events
 
     def snapshot_if_build_x_events
@@ -10,6 +10,10 @@ module Jouba
 
     def snapshot_if_save_x_events
       @snapshot_if_save_x_events || 5
+    end
+
+    def default_listeners
+      @default_listeners || []
     end
 
     def storate_strategy

@@ -12,7 +12,7 @@ module Jouba
             klass.field :aid, as: :aggregate_id, type: String
             klass.field :n, as: :name, type: String
             klass.field :d, as: :data, type: Array
-            klass.field :i, as: :seq_num, type: ::BSON::ObjectId, default: ->{ ::BSON::ObjectId.new }
+            klass.field :i, as: :seq_num, type: ::BSON::ObjectId, default: ->{ ::BSON::ObjectId.new } #Need to be handled by rquest store => http://brandur.org/antipatterns
 
             klass.scope :for_aggregate, ->(aid){ where(aggregate_id: aid) }
             klass.scope :after_seq_num, ->(seq_num){ where(:seq_num.gt => seq_num) }
