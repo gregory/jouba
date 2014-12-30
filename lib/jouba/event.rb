@@ -1,23 +1,13 @@
-require 'active_support/hash_with_indifferent_access'
 module Jouba
-  class Event < ::Hashie::Dash
-    include ::Hashie::Extensions::IndifferentAccess
+  class Event < Hashie::Dash
+    include Hashie::Extensions::IndifferentAccess
+
     property :name, required: true
-    property :aggregate_type
-    property :aggregate_id
-    property :data, type: Array
+    property :data, required: true
+    property :occured_at, default: -> { Time.now.utc }
 
-    def to_s
-      self.name
-    end
-
-    def to_hash
-      {
-        name: self.name,
-        aggregate_type: self.aggregate_type,
-        aggregate_id:   self.aggregate_id,
-        data:           self.data
-      }
+    def self.build(event_name, data)
+      new(name: event_name, data: data)
     end
   end
 end

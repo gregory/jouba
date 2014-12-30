@@ -1,21 +1,54 @@
-require 'wisper'
 require 'hashie'
-require 'mongoid'
+require 'wisper'
 
-Dir["#{File.dirname(__FILE__)}/jouba/**/*.rb"].each { |f| require f }
+require 'jouba/version'
+require 'jouba/event'
+require 'jouba/aggregate'
+require 'jouba/stores'
 
 module Jouba
-  extend Forwardable
-  extend self
+  module_function
 
-  attr_accessor :config
-  def_delegators :config, :event_store, :snapshot_store, :storage_strategy, :storage_engine
+  class Configuration < Hashie::Mash
+    def store
+      @store ||= Hashie::Mash.new
+    end
+  end
+
+  class<<self
+    attr_accessor :adapter
+    attr_reader :adapters_map
+  end
+
+  def adapter
+    @adapter ||= config.store.adapter
+  end
 
   def config
-    @config || fail(ArgumentError, 'Please set the config first')
+    @config ||= Configuration.new
   end
 
   def configure
-    @config = Configuration.new.tap { |configuration| yield(configuration) }
+    config.tap { |configuration| yield(configuration) }
+  end
+
+  def commit(aggregate, event)
+    store.append_events(aggregate, event)
+  end
+
+  def find(aggregate_class, aggregate_id)
+    store.find(aggregate_class, aggregate_id)
+  end
+
+  def adapters_map
+    @adapters_map ||= {}
+  end
+
+  def register_adapter(key, klass)
+    adapters_map.merge!(key => klass.new)
+  end
+
+  def store
+    adapters_map[adapter]  || fail("unknown adapter - valids are #{adapters_map.keys.join(', ')}")
   end
 end

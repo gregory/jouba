@@ -1,17 +1,7 @@
 source "http://rubygems.org"
-# Add dependencies required to use your gem here.
-# Example:
-#   gem "activesupport", ">= 2.3.5"
 
-#gem 'hashie', git: 'https://github.com/intridea/hashie.git', branch: :master
-gem 'hashie', path: '../../hashie/'
-gem 'activesupport', '4.0.3'
+gem 'hashie', '~> 3.3.2'
 gem 'wisper', '~>1.3.0'
-gem 'mongoid', '~>4.0.0.rc1'
-gem 'activemodel'
-gem 'mongoid-versioning', github: 'simi/mongoid-versioning'
-# Add dependencies to develop your gem here.
-# Include everything needed to run rake, tests, features, etc.
 
 group :development do
   gem 'pry'

@@ -1,4 +1,5 @@
 require 'simplecov'
+require 'rspec'
 
 module SimpleCov::Configuration
   def clean_filters
@@ -14,21 +15,18 @@ end
 ENV['COVERAGE'] && SimpleCov.start do
   add_filter '/.rvm/'
 end
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
 
-require 'rspec'
-require 'pry'
 require 'jouba'
 
-# Requires supporting files with custom matchers and macros, etc,
-# in ./support/ and its subdirectories.
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
+RSpec.configure do |config|
+  config.run_all_when_everything_filtered = true
+  config.treat_symbols_as_metadata_keys_with_true_values = true
 
-RSpec.configure do
-  Mongoid.load!(File.expand_path(File.join(File.dirname(__FILE__),  'mongoid.yml')), 'test')
+  Jouba.register_adapter(:random, Struct.new('RandomAdapter'))
 
-  Jouba.configure do |config|
-    config.storage_strategy = :mongoid
+  Jouba.configure do |jouba_config|
+    jouba_config.store.adapter = :random
   end
+
+  config.order = 'random'
 end

@@ -1,33 +1,10 @@
-GIT
-  remote: git://github.com/simi/mongoid-versioning.git
-  revision: a1aa92a4c7b721b004d559ae1112e7b4a6124d94
-  specs:
-    mongoid-versioning (0.0.1)
-      mongoid (> 3)
-
-PATH
-  remote: ../../hashie/
-  specs:
-    hashie (3.0.1)
-
 GEM
   remote: http://rubygems.org/
   specs:
-    activemodel (4.0.3)
-      activesupport (= 4.0.3)
-      builder (~> 3.1.0)
-    activesupport (4.0.3)
-      i18n (~> 0.6, >= 0.6.4)
-      minitest (~> 4.2)
-      multi_json (~> 1.3)
-      thread_safe (~> 0.1)
-      tzinfo (~> 0.3.37)
     addressable (2.3.6)
     ast (2.0.0)
-    bson (2.3.0)
     builder (3.1.4)
     coderay (1.1.0)
-    connection_pool (2.0.0)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     diff-lcs (1.2.5)
@@ -43,8 +20,8 @@ GEM
       multi_json (>= 1.7.5, < 2.0)
       nokogiri (~> 1.6.0)
       oauth2
+    hashie (3.3.2)
     highline (1.6.21)
-    i18n (0.6.9)
     jeweler (2.0.1)
       builder
       bundler (>= 1.0)
@@ -58,16 +35,6 @@ GEM
     jwt (1.0.0)
     method_source (0.8.2)
     mini_portile (0.6.0)
-    minitest (4.7.5)
-    mongoid (4.0.0.rc1)
-      activemodel (~> 4.0.0)
-      moped (~> 2.0.0.rc1)
-      origin (~> 2.1)
-      tzinfo (>= 0.3.37)
-    moped (2.0.0.rc1)
-      bson (~> 2.2)
-      connection_pool (~> 2.0)
-      optionable (~> 0.2.0)
     multi_json (1.10.1)
     multi_xml (0.5.5)
     multipart-post (2.0.0)
@@ -79,8 +46,6 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (~> 1.2)
-    optionable (0.2.0)
-    origin (2.1.1)
     parser (2.1.9)
       ast (>= 1.1, < 3.0)
       slop (~> 3.4, >= 3.4.5)
@@ -91,7 +56,7 @@ GEM
       slop (~> 3.4)
     rack (1.5.2)
     rainbow (2.0.0)
-    rake (10.3.2)
+    rake (10.4.2)
     rdoc (3.12.2)
       json (~> 1.4)
     rspec (2.14.1)
@@ -116,20 +81,15 @@ GEM
     simplecov-html (0.8.0)
     slop (3.5.0)
     thread_safe (0.3.4)
-    tzinfo (0.3.39)
     wisper (1.3.0)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  activemodel
-  activesupport (= 4.0.3)
   bundler (~> 1.0)
-  hashie!
+  hashie (~> 3.3.2)
   jeweler
-  mongoid (~> 4.0.0.rc1)
-  mongoid-versioning!
   pry
   rdoc (~> 3.12)
   rspec (~> 2.14.0)
