@@ -13,8 +13,25 @@ module Jouba
         Jouba.find(self, id)
       end
 
-      def build_from_events(uuid, events)
-        new { |aggregate| aggregate[:uuid] = uuid }.apply_events(events)
+      def build_from_events(uuid, events=[])
+        new.tap do |aggregate|
+          aggregate[:uuid] = uuid
+          aggregate.apply_events(events)
+
+          after_initialize_blocks.each do |block|
+            block.call(aggregate)
+          end
+        end
+      end
+
+      def after_initialize(&block)
+        after_initialize_blocks.push(block)
+      end
+
+      private
+
+      def after_initialize_blocks
+        @after_initialize_blocks ||= []
       end
     end
 

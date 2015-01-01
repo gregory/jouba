@@ -2,11 +2,7 @@ require 'ostruct'
 require 'spec_helper'
 
 describe Jouba::Aggregate do
-  let(:aggregate_class) do
-    Class.new do
-      include Jouba::Aggregate
-    end
-  end
+  let(:aggregate_class) { Class.new { include Jouba::Aggregate } }
 
   subject { aggregate_class }
 
@@ -17,6 +13,41 @@ describe Jouba::Aggregate do
       expect(Jouba).to receive(:find).with(aggregate_class, id)
       subject.find(id)
     end
+  end
+
+  describe '.build_from_events(uuid, events)' do
+    let(:aggregate) { aggregate_class.new }
+    let(:uuid) { '123' }
+    let(:events) { [double(:event)] }
+
+    it 'build the aggregate by applying the events' do
+      expect(aggregate_class).to receive(:new).and_return(aggregate)
+      expect(aggregate).to receive(:[]=).with(:uuid, uuid)
+      expect(aggregate).to receive(:apply_events).with(events)
+      aggregate_class.build_from_events(uuid, events)
+    end
+
+    context 'when after_initialize_blocks is not empty' do
+      let(:observer) { double(:observer) }
+
+      before do
+        aggregate_class.after_initialize do |aggregate|
+          aggregate.subscribe(observer)
+        end
+      end
+
+      it 'apply the blocks once initialized' do
+        expect(aggregate_class).to receive(:new).and_return(aggregate)
+        expect(aggregate).to receive(:apply_events).with(events)
+        expect(aggregate).to receive(:[]=).with(:uuid, uuid)
+        expect(aggregate).to receive(:subscribe).with(observer)
+        aggregate_class.build_from_events(uuid, events)
+      end
+    end
+
+  end
+
+  describe '.after_initialize(&block)' do
   end
 
   describe '#uuid' do
