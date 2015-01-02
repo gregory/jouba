@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["gregory"]
-  s.date = "2014-12-30"
+  s.date = "2015-01-02"
   s.description = "Jouba is a tool set for event sourcing: aggregate root, entities and storage"
   s.email = "greg2502@gmail.com"
   s.extra_rdoc_files = [
@@ -32,9 +32,11 @@ Gem::Specification.new do |s|
     "lib/jouba.rb",
     "lib/jouba/aggregate.rb",
     "lib/jouba/event.rb",
+    "lib/jouba/exceptions.rb",
     "lib/jouba/stores.rb",
     "lib/jouba/version.rb",
     "spec/lib/jouba/aggregate_spec.rb",
+    "spec/lib/jouba/event_spec.rb",
     "spec/lib/jouba_spec.rb",
     "spec/spec_helper.rb"
   ]
