@@ -52,7 +52,7 @@ module Jouba
   end
 
   def with_lock(key)
-    fail(LockException.new("#{key} has been locked")) if Jouba.locked?(key)
+    fail(LockException, "#{key} has been locked") if Jouba.locked?(key)
 
     begin
       stores[:lock].lock!(key)

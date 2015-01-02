@@ -194,7 +194,7 @@ describe Jouba do
         let(:exception) { StandardError.new }
 
         it 'make sure to release the lock' do
-          expect { |b| described_class.with_lock(key){ fail(exception) } }.to raise_error
+          expect { described_class.with_lock(key) { fail(exception) } }.to raise_error
         end
       end
     end
