@@ -1,10 +1,10 @@
 module Jouba
   module Stores
-    def self.append_events(aggregate, events)
+    def self.append_events(_, _)
       fail NotImplementedError
     end
 
-    def self.find(id)
+    def self.find(_)
       fail NotImplementedError
     end
 
@@ -12,15 +12,15 @@ module Jouba
       fail NotImplementedError
     end
 
-    def self.locked?(key)
+    def self.locked?(_)
       fail NotImplementedError
     end
 
-    def self.lock!(key)
+    def self.lock!(_)
       fail NotImplementedError
     end
 
-    def self.unlock!(key)
+    def self.unlock!(_)
       fail NotImplementedError
     end
   end

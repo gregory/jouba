@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Jouba::Event do
   let(:event_name) { 'event_name' }
-  let(:data) { [:foo, 1, 'bar', { foo: 'bar'}, [1,2] ] }
+  let(:data) { [:foo, 1, 'bar', { foo: 'bar' }, [1, 2]] }
   let(:occured_at) { double(:time) }
 
   describe '.build(event_name, data)' do

@@ -43,8 +43,16 @@ module Jouba
       event = Event.build(event_name, args)
 
       apply_events(event)
-      Jouba.commit(self, event)
-      publish(event_name, args)
+      Jouba.commit(self, event) do
+        publish(event_name, args)
+      end
+    end
+
+    def commit_with_lock(event_name, args, lock_key)
+      raise "Locked" if Jouba.locked?(lock_key)
+      Jouba.with_lock(lock_key) do
+        commit(event_name, args)
+      end
     end
 
     def apply_events(events)
