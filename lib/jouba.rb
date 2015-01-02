@@ -2,6 +2,7 @@ require 'hashie'
 require 'wisper'
 
 require 'jouba/version'
+require 'jouba/exceptions'
 require 'jouba/event'
 require 'jouba/aggregate'
 require 'jouba/stores'
@@ -9,46 +10,55 @@ require 'jouba/stores'
 module Jouba
   module_function
 
-  class Configuration < Hashie::Mash
-    def store
-      @store ||= Hashie::Mash.new
+  def adapters_map
+    @adapters_map ||= Hashie::Mash.new do |_, k|
+      fail("Unknown adapter #{k}, valids are: #{@adapters_map.keys.join(' ')}")
     end
   end
 
-  class<<self
-    attr_accessor :adapter
-    attr_reader :adapters_map
-  end
-
-  def adapter
-    @adapter ||= config.store.adapter
-  end
-
-  def config
-    @config ||= Configuration.new
-  end
-
-  def configure
-    config.tap { |configuration| yield(configuration) }
+  def alias_store(alias_name, target)
+    stores[alias_name] = stores[target]
   end
 
   def commit(aggregate, event)
-    store.append_events(aggregate, event)
+    yield if stores[:events].append_events(aggregate, event)
+  end
+
+  def config
+    @config ||= Hashie::Mash.new { |_, k| fail("Unknown key #{k}, please use configure to set it up") }
   end
 
   def find(aggregate_class, aggregate_id)
-    store.find(aggregate_class, aggregate_id)
+    stores[:events].find(aggregate_class, aggregate_id)
   end
 
-  def adapters_map
-    @adapters_map ||= {}
+  def locked?(key)
+    stores[:lock].locked?(key)
   end
 
   def register_adapter(key, klass)
-    adapters_map.merge!(key => klass.new)
+    adapters_map[key] = klass
   end
 
-  def store
-    adapters_map[adapter]  || fail("unknown adapter - valids are #{adapters_map.keys.join(', ')}")
+  def register_store(name)
+    yield(config.stores!.send("#{name}!"))
+    store_config = config.stores[name]
+    adapter = adapters_map[store_config.adapter]
+    stores[name] = adapter.new(store_config)
+  end
+
+  def stores
+    @stores ||= Hashie::Mash.new { |_, k| fail("Unknown store #{k}, valids are: #{@stores.keys.join(' ')}") }
+  end
+
+  def with_lock(key)
+    fail(LockException.new("#{key} has been locked")) if Jouba.locked?(key)
+
+    begin
+      stores[:lock].lock!(key)
+      yield
+    ensure
+      stores[:lock].unlock!(key)
+    end
   end
 end

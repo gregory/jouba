@@ -22,11 +22,12 @@ RSpec.configure do |config|
   config.run_all_when_everything_filtered = true
   config.treat_symbols_as_metadata_keys_with_true_values = true
 
-  Jouba.register_adapter(:random, Struct.new('RandomAdapter'))
+  Jouba.register_adapter(:random, Struct.new('RandomAdapter', :config))
 
-  Jouba.configure do |jouba_config|
-    jouba_config.store.adapter = :random
+  Jouba.register_store(:events) do |store_config|
+    store_config.adapter = :random
   end
+  Jouba.alias_store(:lock, :events)
 
   config.order = 'random'
 end

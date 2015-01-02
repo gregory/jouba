@@ -65,7 +65,7 @@ describe Jouba::Aggregate do
     let(:event) { Jouba::Event.new(name: event_name, data: data) }
 
     it 'append the event to the store' do
-      expect(Jouba.store).to receive(:append_events).with(aggregate, event)
+      expect(Jouba.stores[:events]).to receive(:append_events).with(aggregate, event)
       expect(Jouba::Event).to receive(:build).with(event_name, data).and_return(event)
       expect(aggregate).to receive(event_name).with(data)
       aggregate.commit(event_name, data)

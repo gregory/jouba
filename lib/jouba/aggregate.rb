@@ -13,7 +13,7 @@ module Jouba
         Jouba.find(self, id)
       end
 
-      def build_from_events(uuid, events=[])
+      def build_from_events(uuid, events = [])
         new.tap do |aggregate|
           aggregate[:uuid] = uuid
           aggregate.apply_events(events)
@@ -49,7 +49,6 @@ module Jouba
     end
 
     def commit_with_lock(event_name, args, lock_key)
-      raise "Locked" if Jouba.locked?(lock_key)
       Jouba.with_lock(lock_key) do
         commit(event_name, args)
       end
