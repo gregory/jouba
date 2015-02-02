@@ -1,64 +1,77 @@
+require 'jouba'
+require 'jouba/cache'
+require 'wisper'
+
 module Jouba
-  module Aggregate
-    attr_reader :uuid
+  class Aggregate < Module
+    attr_reader :options
 
-    include Wisper::Publisher
-
-    def self.included(target_class)
-      target_class.extend ClassMethods
+    def initialize(options={})
+      @options = options
+      after_initialize
     end
 
-    module ClassMethods
-      def find(id)
-        Jouba.find(self, id)
-      end
-
-      def build_from_events(uuid, events = [])
-        new.tap do |aggregate|
-          aggregate[:uuid] = uuid
-          aggregate.apply_events(events)
-
-          after_initialize_blocks.each do |block|
-            block.call(aggregate)
+    def after_initialize
+      self.tap do |mod|
+        mod.define_singleton_method :included do |object|
+          super(object)
+          object.extend(ClassMethods)
+          object.send :include, InstanceMethods
+          object.send :include, Wisper::Publisher
+          object.define_singleton_method :__module_options__ do
+            mod.options
           end
         end
       end
+    end
 
-      def after_initialize(&block)
-        after_initialize_blocks.push(block)
+    module InstanceMethods
+      def emit(name, *args)
+        event = Jouba.Event.new(key: to_key, name: name, data: args)
+        apply_event(event)
+        Jouba.Cache.refresh(to_key, self) { event.track }
+        publish(event.name, event.data)
+      end
+
+      def replay(event)
+        send __callback_method__(:"#{event.name}"), *event.data
+      end
+      alias_method :apply_event, :replay
+
+      def to_key
+        fail 'Please make sure there is a uuid first' unless respond_to?(:uuid) && !uuid.nil?
+        self.class.key_from_uuid(uuid)
       end
 
       private
 
-      def after_initialize_blocks
-        @after_initialize_blocks ||= []
+      def __callback_method__(name)
+        :"#{__callback_prefix__}#{name}"
+      end
+
+      def __callback_prefix__
+        options = self.class.__module_options__
+        options[:prefix].nil? ? "" : "#{options[:prefix]}_"
       end
     end
 
-    def uuid
-      @uuid ||= SecureRandom.uuid
-    end
-
-    def commit(event_name, args)
-      event = Event.build(event_name, args)
-
-      apply_events(event)
-      Jouba.commit(self, event) do
-        publish(event_name, args)
+    module ClassMethods
+      def replay(events)
+        new.tap { |aggregate| Array(events).each { |event| aggregate.replay(event) } }
       end
-    end
 
-    def commit_with_lock(event_name, args, lock_key)
-      Jouba.with_lock(lock_key) do
-        commit(event_name, args)
+      def find(uuid)
+        key = key_from_uuid(uuid)
+        Jouba.Cache.fetch(key) { replay stream(uuid) }
       end
-    end
 
-    def apply_events(events)
-      [events].flatten.each do |event|
-        next unless respond_to?(event.name.to_sym)
+      def stream(uuid, params={})
+        Jouba.Event.stream(key_from_uuid(uuid), params)
+      end
 
-        send(event.name.to_sym, event.data)
+
+      def key_from_uuid(uuid)
+        Jouba.Key.serialize(self.name, uuid) # => default "ClassName.id"
       end
     end
   end

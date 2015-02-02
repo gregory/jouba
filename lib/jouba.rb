@@ -1,64 +1,44 @@
+require 'pry' #TODO: remove me
+require 'forwardable'
 require 'hashie'
-require 'wisper'
+require 'locality-uuid'
 
 require 'jouba/version'
-require 'jouba/exceptions'
+require 'jouba/key'
 require 'jouba/event'
-require 'jouba/aggregate'
-require 'jouba/stores'
+require 'jouba/store'
+require 'jouba/cache'
 
 module Jouba
   module_function
 
-  def adapters_map
-    @adapters_map ||= Hashie::Mash.new do |_, k|
-      fail("Unknown adapter #{k}, valids are: #{@adapters_map.keys.join(' ')}")
-    end
-  end
-
-  def alias_store(alias_name, target)
-    stores[alias_name] = stores[target]
-  end
-
-  def commit(aggregate, event)
-    yield if stores[:events].append_events(aggregate, event)
+  class<<self
+    extend Forwardable
+    def_delegators :config, :Key, :Event, :Cache, :Store
   end
 
   def config
-    @config ||= Hashie::Mash.new { |_, k| fail("Unknown key #{k}, please use configure to set it up") }
-  end
-
-  def find(aggregate_class, aggregate_id)
-    stores[:events].find(aggregate_class, aggregate_id)
-  end
-
-  def locked?(key)
-    stores[:lock].locked?(key)
-  end
-
-  def register_adapter(key, klass)
-    adapters_map[key] = klass
-  end
-
-  def register_store(name)
-    yield(config.stores!.send("#{name}!"))
-    store_config = config.stores[name]
-    adapter = adapters_map[store_config.adapter]
-    stores[name] = adapter.new(store_config)
-  end
-
-  def stores
-    @stores ||= Hashie::Mash.new { |_, k| fail("Unknown store #{k}, valids are: #{@stores.keys.join(' ')}") }
-  end
-
-  def with_lock(key)
-    fail(LockException, "#{key} has been locked") if Jouba.locked?(key)
-
-    begin
-      stores[:lock].lock!(key)
-      yield
-    ensure
-      stores[:lock].unlock!(key)
+    @config ||= Hashie::Mash.new do |h, k|
+      case k
+      when 'Event'
+        h[k] = Jouba::Event
+      when 'Key'
+        h[k] = Jouba::Key
+      when 'Cache'
+        h[k] = Cache::Null.new
+      when 'Store'
+        h[k] = Jouba::EventStore.new
+      else
+        nil
+      end
     end
+  end
+
+  def emit(key , name , data)
+    config.Event.new(key: key, name: name, data: data).track
+  end
+
+  def stream(key, params={})
+    config.Event.stream(key, params)
   end
 end

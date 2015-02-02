@@ -1,74 +1,115 @@
-require 'ostruct'
 require 'spec_helper'
+require 'jouba/aggregate'
 
 describe Jouba::Aggregate do
-  let(:aggregate_class) { Class.new { include Jouba::Aggregate } }
+  let(:uuid) { '123' }
+  let(:attributes) { { name: 'bar' }  }
+  let(:name) { :created }
+  let(:event) { Jouba::Event.new(key: target.to_key, name: name, data: attributes) }
+  let(:listener) { double(:listener) }
 
-  subject { aggregate_class }
+  let(:target_class) do
+    Class.new(OpenStruct) do
+      include Jouba::Aggregate.new(prefix: :on)
+      include Wisper::Publisher
 
-  describe '.find(id)' do
-    let(:id) { 2 }
-
-    it 'query the store' do
-      expect(Jouba).to receive(:find).with(aggregate_class, id)
-      subject.find(id)
+      def create(attributes)
+        emit(:created, attributes)
+      end
     end
   end
+  let(:target) { target_class.new(uuid: uuid) }
 
-  describe '.build_from_events(uuid, events)' do
-    let(:aggregate) { aggregate_class.new }
-    let(:uuid) { '123' }
-    let(:events) { [double(:event)] }
-
-    it 'build the aggregate by applying the events' do
-      expect(aggregate_class).to receive(:new).and_return(aggregate)
-      expect(aggregate).to receive(:[]=).with(:uuid, uuid)
-      expect(aggregate).to receive(:apply_events).with(events)
-      aggregate_class.build_from_events(uuid, events)
-    end
-
-    context 'when after_initialize_blocks is not empty' do
-      let(:observer) { double(:observer) }
-
-      before do
-        aggregate_class.after_initialize do |aggregate|
-          aggregate.subscribe(observer)
-        end
-      end
-
-      it 'apply the blocks once initialized' do
-        expect(aggregate_class).to receive(:new).and_return(aggregate)
-        expect(aggregate).to receive(:apply_events).with(events)
-        expect(aggregate).to receive(:[]=).with(:uuid, uuid)
-        expect(aggregate).to receive(:subscribe).with(observer)
-        aggregate_class.build_from_events(uuid, events)
+  describe '.initialize' do
+    it 'has instance methods of an aggreate' do
+      described_class::InstanceMethods.public_instance_methods.each do |meth|
+        expect(target_class.new).to respond_to(meth)
       end
     end
 
-  end
-
-  describe '.after_initialize(&block)' do
-  end
-
-  describe '#uuid' do
-    let(:uuids) { (1..3).map { aggregate_class.new.uuid } }
-
-    it 'return a different uuid for each instance' do
-      expect(uuids.uniq.size).to eq 3
+    it 'has class methods of an aggreate' do
+      described_class::ClassMethods.public_instance_methods.each do |meth|
+        expect(target_class).to respond_to(meth)
+      end
     end
   end
 
-  describe '#commit(aggregate, event)' do
-    let(:aggregate) { aggregate_class.new }
-    let(:data) { { value: 10, meta: OpenStruct.new(foo: 'bar') } }
-    let(:event_name) { 'add_credit' }
-    let(:event) { Jouba::Event.new(name: event_name, data: data) }
+  describe '#emit(name, *args)' do
+    after { target.create(attributes) }
 
-    it 'append the event to the store' do
-      expect(Jouba.stores[:events]).to receive(:append_events).with(aggregate, event)
-      expect(Jouba::Event).to receive(:build).with(event_name, data).and_return(event)
-      expect(aggregate).to receive(event_name).with(data)
-      aggregate.commit(event_name, data)
+    before do
+      expect(Jouba.Event).to receive(:new).
+        with(key: target.to_key, name: name, data: [attributes]).and_return(event)
+      expect(target).to receive(:"on_#{name}").with(*attributes)
+    end
+
+    it 'apply the event' do
+      expect(target).to receive(:apply_event).with(event).and_call_original
+    end
+
+    it 'refresh the cache' do
+      expect(Jouba.Cache).to receive(:refresh).with(target.to_key, target).
+        and_yield.and_call_original
+    end
+
+    it 'publish an event' do
+      target.subscribe(listener, prefix: :on)
+      expect(listener).to receive(:"on_#{name}").with(attributes)
+    end
+  end
+
+  describe '#to_key' do
+    let(:uuid) { 123 }
+    it 'delegates to the class method' do
+      expect(target_class).to receive(:key_from_uuid).with(target.uuid)
+      target.to_key
+    end
+  end
+
+  describe '#replay(event)' do
+    after { target.replay(event) }
+    it 'calls the callback_method with the right params' do
+      expect(target).to receive(:"on_#{name}").with(*attributes)
+    end
+  end
+
+  describe '.replay(events)' do
+    let(:events) { [event, event] }
+
+    after { target_class.replay(events) }
+    before { expect(target_class).to receive(:new).and_return(target) }
+
+    it 'create a new instance of the aggregate and apply all the events' do
+      expect(target).to receive(:replay).with(event).exactly(2).times
+    end
+  end
+
+  describe '.find(uuid)' do
+    let(:key) { target_class.key_from_uuid(uuid) }
+    let(:stream) { [] }
+    after { target_class.find(uuid) }
+
+    it 'goes through the cache' do
+      expect(target_class).to receive(:stream).with(uuid).and_return(stream)
+      expect(target_class).to receive(:replay).with(stream)
+      expect(Jouba.Cache).to receive(:fetch).with(key).and_yield.and_call_original
+    end
+  end
+
+  describe '.stream(uuid)' do
+    let(:key) { target_class.key_from_uuid(uuid) }
+    let(:params) { {} }
+    after { target_class.stream(uuid, params) }
+    it 'returns the stream from the EventStore' do
+      expect(Jouba.Event).to receive(:stream).with(key, params)
+    end
+  end
+
+  describe '.key_from_uuid(uuid)' do
+    after { target_class.key_from_uuid(uuid) }
+
+    it 'delegates to the configured key structure' do
+      expect(Jouba.Key).to receive(:serialize).with(target_class.name, uuid)
     end
   end
 end
