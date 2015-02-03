@@ -31,7 +31,7 @@ module Jouba
 
   def emit(key , name , data)
     config.Event.new(key: key, name: name, data: data).tap do |event|
-      event.track
+      block_given? ? yield(event) : event.track
       publish(key, event)
     end
   end

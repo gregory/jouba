@@ -26,10 +26,11 @@ module Jouba
 
     module InstanceMethods
       def emit(name, *args)
-        event = Jouba.Event.new(key: to_key, name: name, data: args)
-        apply_event(event)
-        Jouba.Cache.refresh(to_key, self) { event.track }
-        publish(event.name, event.data)
+        Jouba.emit(to_key, name, args) do |event|
+          apply_event(event)
+          Jouba.Cache.refresh(to_key, self) { event.track }
+          publish(event.name, event.data)
+        end
       end
 
       def replay(event)
