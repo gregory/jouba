@@ -1,7 +1,6 @@
 source "http://rubygems.org"
 
-#gem 'hashie', '~> 3.3.2'
-gem 'hashie', git: 'https://github.com/gregory/hashie.git', branch: :defaults_based_on_self
+gem 'hashie', '~> 3.4.0'
 gem 'wisper', '~>1.6.0'
 gem 'locality-uuid'
 
