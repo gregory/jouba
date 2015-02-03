@@ -88,7 +88,7 @@ GEM
     slop (3.5.0)
     systemu (2.6.4)
     thread_safe (0.3.4)
-    wisper (1.6.0)
+    wisper (2.0.0.rc1)
 
 PLATFORMS
   ruby
@@ -103,4 +103,4 @@ DEPENDENCIES
   rspec (~> 2.14)
   rubocop (~> 0.23)
   simplecov (~> 0)
-  wisper (~> 1.6)
+  wisper (~> 2.0.0.rc1)

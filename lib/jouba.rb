@@ -1,5 +1,6 @@
 require 'forwardable'
 require 'hashie'
+require 'wisper'
 require 'locality-uuid'
 
 require 'jouba/version'
@@ -19,6 +20,7 @@ module Jouba
   }
 
   class<<self
+    include Wisper::Publisher
     extend Forwardable
     def_delegators :config, :Key, :Event, :Cache, :Store
   end
@@ -28,7 +30,10 @@ module Jouba
   end
 
   def emit(key , name , data)
-    config.Event.new(key: key, name: name, data: data).track
+    config.Event.new(key: key, name: name, data: data).tap do |event|
+      event.track
+      publish(key, event)
+    end
   end
 
   def stream(key, params = {})

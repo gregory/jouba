@@ -1,6 +1,5 @@
 require 'jouba'
 require 'jouba/cache'
-require 'wisper'
 
 module Jouba
   class Aggregate < Module

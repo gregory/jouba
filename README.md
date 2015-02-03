@@ -48,6 +48,12 @@
   Jouba.emit('us.computer1.cpu', :idle, {value: 50})
   Jouba.stream('us.computer1.cpu').since(1.month.ago).where({value: ->(v) { v >= 20 }})
 
+  Jouba.subscribe(Logger, on: /.*/, with: :log)
+
+  Jouba.subscribe(Graphite, on: /us.*/, with: :post, async: true).on_error do |error, name,payload|
+    #DO SOMETHING
+  end
+
   Jouba.config.Cache = Jouba::Cache::Memory.new
   require 'jouba/aggregate'
   customer_params = { fname: 'foo', lname: 'bar' }

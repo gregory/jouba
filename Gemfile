@@ -1,7 +1,7 @@
 source "http://rubygems.org"
 
 gem 'hashie', '~> 3.4'
-gem 'wisper', '~>1.6'
+gem 'wisper', '~>2.0.0.rc1'
 gem 'locality-uuid'
 
 group :development do
