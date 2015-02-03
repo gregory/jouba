@@ -2,6 +2,19 @@
 
 
 ```ruby
+
+  Jouba.emit('us.computer1.cpu', :idle, {value: 50})
+  Jouba.stream('us.computer1.cpu').since(1.month.ago).where({value: ->(v) { v >= 20 }})
+
+  Jouba.subscribe(Logger, on: /.*/, with: :log)
+
+  Jouba.subscribe(Graphite, on: /us.*/, with: :post, async: true).on_error do |error, name,payload|
+    #DO SOMETHING
+  end
+```
+
+```ruby
+  require 'jouba/aggregate'
   class Customer < Hashie::Dash
     include Jouba::Aggregate.new(prefix: :on)
     property :uuid
@@ -24,50 +37,21 @@
     end
   end
 
-  class Admin
-    include Jouba::Aggregate.new(prefix: :on)
-
-    def self.create(attributes)
-      Admin.new(uuid: SecureRandom.uuid).tap do |admin|
-        admin.create(attributes.merge(uuid: admin.uuid))
-      end
-    end
-
-    def create(attributes)
-      emit(:created, attributes)
-    end
-
-  private
-
-    def on_created(attributes)
-      update_attributes!(attributes)
-    end
-  end
-
-
-  Jouba.emit('us.computer1.cpu', :idle, {value: 50})
-  Jouba.stream('us.computer1.cpu').since(1.month.ago).where({value: ->(v) { v >= 20 }})
-
-  Jouba.subscribe(Logger, on: /.*/, with: :log)
-
-  Jouba.subscribe(Graphite, on: /us.*/, with: :post, async: true).on_error do |error, name,payload|
-    #DO SOMETHING
-  end
-
   Jouba.config.Cache = Jouba::Cache::Memory.new
-  require 'jouba/aggregate'
-  customer_params = { fname: 'foo', lname: 'bar' }
+  Jouba.subscribe(CustomerAnalytics, on: /Customer.+/, with: :track)
 
-  c = Customer.create(customer_params, true)
+  c = Customer.create({fname: 'foo', lname: 'bar'})
   c.fname # => "foo"
   c.uuid # => 123
   c.to_key # => "Customer.123"
 
   d = Customer.find(c.uuid)
-
+  Customer.stream(c.uuid).count #=> 1
+  c == d #=> true
 ```
 
 ```ruby
+
   class Store < AR
     set_table_name :events
 
@@ -84,16 +68,39 @@
 
   Jouba.config.Store = Store
 
+```
+
+```ruby
+  class Admin
+    include Jouba::Aggregate.new(prefix: :on)
+
+    def self.create(attributes)
+      Admin.new(uuid: SecureRandom.uuid).tap do |admin|
+        admin.create(attributes.merge(uuid: admin.uuid))
+      end
+    end
+
+    def create(attributes)
+      emit(:created, attributes)
+    end
+
+    private
+
+    def on_created(attributes)
+      update_attributes!(attributes)
+    end
+  end
+
   class UserRepository < AR
     set_table_name :users
     # must have a key column
 
-    def self.on_created(attributes)
+    def self.has_been_created(attributes)
       create(attributes)
     end
   end
 
-  Wisper.subscribe(UserRepository, scope: [:Customer, :Admin], prefix: :on)
+  Wisper.subscribe(UserRepository, scope: [:Customer, :Admin], prefix: :has_been)
 ```
 
 
