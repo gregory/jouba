@@ -3,8 +3,13 @@ require 'forwardable'
 module Jouba
   module Cache
     class Null
-      def fetch(key);          yield; end
-      def refresh(key, value); yield; end
+      def fetch(_)
+        yield
+      end
+
+      def refresh(_, _)
+        yield
+      end
     end
 
     class Memory

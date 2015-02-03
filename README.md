@@ -49,6 +49,7 @@
   Jouba.stream('us.computer1.cpu').since(1.month.ago).where({value: ->(v) { v >= 20 }})
 
   Jouba.config.Cache = Jouba::Cache::Memory.new
+  require 'jouba/aggregate'
   customer_params = { fname: 'foo', lname: 'bar' }
 
   c = Customer.create(customer_params, true)

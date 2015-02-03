@@ -9,7 +9,7 @@ module Jouba
       flush
     end
 
-    def get(key, params={})
+    def get(key, _ = {})
       db[key].nil? ? nil : deserialize(db[key])
     end
 
@@ -30,7 +30,7 @@ module Jouba
     end
 
     def self.load(file_path)
-      new.tap{ |store| store.instance_variable_set("@db", YAML::load_file(file_path)) }
+      new.tap { |store| store.instance_variable_set('@db', YAML.load_file(file_path)) }
     end
 
     protected
@@ -61,8 +61,8 @@ module Jouba
       end
     end
 
-    def get(key, params={})
-      Collection.new db[key].map{ |item| deserialize(item) }
+    def get(key, _ = {})
+      Collection.new db[key].map { |item| deserialize(item) }
     end
 
     def set(key, value)
@@ -70,7 +70,7 @@ module Jouba
     end
 
     def flush
-      @db = Hash.new { |h,k| h[k] = [] }
+      @db = Hash.new { |h, k| h[k] = [] }
     end
   end
 end

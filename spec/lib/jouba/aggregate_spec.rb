@@ -38,8 +38,8 @@ describe Jouba::Aggregate do
     after { target.create(attributes) }
 
     before do
-      expect(Jouba.Event).to receive(:new).
-        with(key: target.to_key, name: name, data: [attributes]).and_return(event)
+      expect(Jouba.Event).to receive(:new)
+        .with(key: target.to_key, name: name, data: [attributes]).and_return(event)
       expect(target).to receive(:"on_#{name}").with(*attributes)
     end
 
@@ -48,8 +48,8 @@ describe Jouba::Aggregate do
     end
 
     it 'refresh the cache' do
-      expect(Jouba.Cache).to receive(:refresh).with(target.to_key, target).
-        and_yield.and_call_original
+      expect(Jouba.Cache).to receive(:refresh).with(target.to_key, target)
+        .and_yield.and_call_original
     end
 
     it 'publish an event' do

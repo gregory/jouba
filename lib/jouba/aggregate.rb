@@ -6,22 +6,22 @@ module Jouba
   class Aggregate < Module
     attr_reader :options
 
-    def initialize(options={})
+    def initialize(options = {})
       @options = options
-      after_initialize
-    end
-
-    def after_initialize
-      self.tap do |mod|
+      tap do |mod|
         mod.define_singleton_method :included do |object|
           super(object)
-          object.extend(ClassMethods)
-          object.send :include, InstanceMethods
-          object.send :include, Wisper::Publisher
-          object.define_singleton_method :__module_options__ do
-            mod.options
-          end
+          after_included(object, mod)
         end
+      end
+    end
+
+    def after_included(object, mod)
+      object.extend(ClassMethods)
+      object.send :include, InstanceMethods
+      object.send :include, Wisper::Publisher
+      object.define_singleton_method :__module_options__ do
+        mod.options
       end
     end
 
@@ -51,7 +51,7 @@ module Jouba
 
       def __callback_prefix__
         options = self.class.__module_options__
-        options[:prefix].nil? ? "" : "#{options[:prefix]}_"
+        options[:prefix].nil? ? '' : "#{options[:prefix]}_"
       end
     end
 
@@ -65,13 +65,12 @@ module Jouba
         Jouba.Cache.fetch(key) { replay stream(uuid) }
       end
 
-      def stream(uuid, params={})
+      def stream(uuid, params = {})
         Jouba.Event.stream(key_from_uuid(uuid), params)
       end
 
-
       def key_from_uuid(uuid)
-        Jouba.Key.serialize(self.name, uuid) # => default "ClassName.id"
+        Jouba.Key.serialize(name, uuid) # => default "ClassName.id"
       end
     end
   end

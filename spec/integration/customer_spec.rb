@@ -17,7 +17,7 @@ describe 'Aggregate' do
       emit(:created, attributes)
     end
 
-  private
+    private
 
     def on_created(attributes)
       update_attributes!(attributes)

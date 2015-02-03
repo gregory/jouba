@@ -22,7 +22,7 @@ module Jouba
     def track
       Jouba.Store.set(key, Event.serialize(self))
     end
-    alias save track
+    alias_method :save, :track
 
     private
 
