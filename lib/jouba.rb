@@ -1,4 +1,3 @@
-require 'pry'
 require 'forwardable'
 require 'hashie'
 require 'locality-uuid'

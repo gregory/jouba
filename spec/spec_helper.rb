@@ -1,5 +1,6 @@
 require 'simplecov'
 require 'rspec'
+require 'pry'
 
 module SimpleCov::Configuration
   def clean_filters
