@@ -11,12 +11,12 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["gregory"]
-  s.date = "2015-01-02"
+  s.date = "2015-02-03"
   s.description = "Jouba is a tool set for event sourcing: aggregate root, entities and storage"
   s.email = "greg2502@gmail.com"
   s.extra_rdoc_files = [
     "LICENSE.txt",
-    "README.rdoc"
+    "README.md"
   ]
   s.files = [
     ".document",
@@ -25,18 +25,22 @@ Gem::Specification.new do |s|
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",
-    "README.rdoc",
+    "README.md",
     "Rakefile",
     "VERSION",
     "jouba.gemspec",
     "lib/jouba.rb",
     "lib/jouba/aggregate.rb",
+    "lib/jouba/cache.rb",
     "lib/jouba/event.rb",
-    "lib/jouba/exceptions.rb",
-    "lib/jouba/stores.rb",
+    "lib/jouba/key.rb",
+    "lib/jouba/store.rb",
     "lib/jouba/version.rb",
+    "spec/integration/customer_spec.rb",
     "spec/lib/jouba/aggregate_spec.rb",
+    "spec/lib/jouba/cache_spec.rb",
     "spec/lib/jouba/event_spec.rb",
+    "spec/lib/jouba/key_spec.rb",
     "spec/lib/jouba_spec.rb",
     "spec/spec_helper.rb"
   ]
@@ -49,8 +53,9 @@ Gem::Specification.new do |s|
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<hashie>, ["~> 3.3"])
-      s.add_runtime_dependency(%q<wisper>, ["~> 1.3"])
+      s.add_runtime_dependency(%q<hashie>, ["~> 3.4.0"])
+      s.add_runtime_dependency(%q<wisper>, ["~> 1.6.0"])
+      s.add_runtime_dependency(%q<locality-uuid>, [">= 0"])
       s.add_development_dependency(%q<pry>, ["~> 0"])
       s.add_development_dependency(%q<rspec>, ["~> 2.14"])
       s.add_development_dependency(%q<rdoc>, ["~> 3.12"])
@@ -59,8 +64,9 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<simplecov>, ["~> 0"])
       s.add_development_dependency(%q<rubocop>, ["~> 0.23"])
     else
-      s.add_dependency(%q<hashie>, ["~> 3.3"])
-      s.add_dependency(%q<wisper>, ["~> 1.3"])
+      s.add_dependency(%q<hashie>, ["~> 3.4.0"])
+      s.add_dependency(%q<wisper>, ["~> 1.6.0"])
+      s.add_dependency(%q<locality-uuid>, [">= 0"])
       s.add_dependency(%q<pry>, ["~> 0"])
       s.add_dependency(%q<rspec>, ["~> 2.14"])
       s.add_dependency(%q<rdoc>, ["~> 3.12"])
@@ -70,8 +76,9 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<rubocop>, ["~> 0.23"])
     end
   else
-    s.add_dependency(%q<hashie>, ["~> 3.3"])
-    s.add_dependency(%q<wisper>, ["~> 1.3"])
+    s.add_dependency(%q<hashie>, ["~> 3.4.0"])
+    s.add_dependency(%q<wisper>, ["~> 1.6.0"])
+    s.add_dependency(%q<locality-uuid>, [">= 0"])
     s.add_dependency(%q<pry>, ["~> 0"])
     s.add_dependency(%q<rspec>, ["~> 2.14"])
     s.add_dependency(%q<rdoc>, ["~> 3.12"])
