@@ -25,11 +25,11 @@
   end
 
   class Admin
-    include Jouba::Aggregate.new(prefix: :on) # include Wisper and Anima
+    include Jouba::Aggregate.new(prefix: :on)
 
     def self.create(attributes)
       Admin.new(uuid: SecureRandom.uuid).tap do |admin|
-        admin.create(attributes.merge(uuid: customer.uuid))
+        admin.create(attributes.merge(uuid: admin.uuid))
       end
     end
 
@@ -82,13 +82,12 @@
     set_table_name :users
     # must have a key column
 
-    def on_created(attributes)
-      self.create(attributes)
+    def self.on_created(attributes)
+      create(attributes)
     end
-    alias :on_created
   end
 
-  Wisper.subscribe(UserRepository.new, scope: :Customer)
+  Wisper.subscribe(UserRepository, scope: [:Customer, :Admin], prefix: :on)
 ```
 
 
