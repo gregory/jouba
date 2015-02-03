@@ -95,7 +95,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.0)
-  hashie (~> 3.4.0)
+  hashie (~> 3.4)
   jeweler (~> 2.0)
   locality-uuid
   pry (~> 0)
@@ -103,4 +103,4 @@ DEPENDENCIES
   rspec (~> 2.14)
   rubocop (~> 0.23)
   simplecov (~> 0)
-  wisper (~> 1.6.0)
+  wisper (~> 1.6)
