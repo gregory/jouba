@@ -34,7 +34,7 @@ At it's core, it relies on the excellent [wisper](https://github.com/krisleech/w
 ```ruby
 
 Jouba.emit('us.computer1.cpu', :idle, {value: 50})
-Jouba.subscribe(Logger, on: /.*/, with: :log)
+Jouba.subscribe(Logger.new, on: /.*/, with: :log)
 Jouba.subscribe(Graphite, on: /us.*/, with: :post, async: true).on_error do |error, name,payload|
 	#DO SOMETHING
 end
@@ -117,7 +117,7 @@ class Customer < Hashie::Dash
     emit(:created, attributes)
   end
 
-	private
+  private
 
   def on_created(attributes)
     update_attributes!(attributes)
