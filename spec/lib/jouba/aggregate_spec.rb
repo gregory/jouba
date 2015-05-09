@@ -38,8 +38,8 @@ describe Jouba::Aggregate do
 
     before do
       expect(Jouba.Event).to receive(:new)
-        .with(key: target.to_key, name: name, data: [attributes]).and_return(event)
-      expect(target).to receive(:"on_#{name}").with(*attributes)
+        .with(key: target.to_key, name: name, data: attributes).and_return(event)
+      expect(target).to receive(:"on_#{name}").with(attributes)
     end
 
     it 'apply the event' do
@@ -68,7 +68,7 @@ describe Jouba::Aggregate do
   describe '#replay(event)' do
     after { target.replay(event) }
     it 'calls the callback_method with the right params' do
-      expect(target).to receive(:"on_#{name}").with(*attributes)
+      expect(target).to receive(:"on_#{name}").with(attributes)
     end
   end
 
@@ -109,6 +109,21 @@ describe Jouba::Aggregate do
 
     it 'delegates to the configured key structure' do
       expect(Jouba.Key).to receive(:serialize).with(target_class.name, uuid)
+    end
+  end
+
+  describe 'PR[5] Remove Arrayification of Event\'s data' do
+    before do
+      @original_data = Object.new
+
+      target.define_singleton_method(:on_remove_arrayification){|_| }
+      target.on(:remove_arrayification) { |data| @event_data = data }
+      target.emit(:remove_arrayification, @original_data)
+    end
+
+    it 'does not change emitted data' do
+      expect(@event_data).to eq @original_data
+      expect(@event_data).to_not be_an_instance_of(Array)
     end
   end
 end
