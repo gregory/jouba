@@ -25,8 +25,8 @@ module Jouba
     end
 
     module InstanceMethods
-      def emit(name, *args)
-        Jouba.emit(to_key, name, args) do |event|
+      def emit(name, data)
+        Jouba.emit(to_key, name, data) do |event|
           apply_event(event)
           Jouba.Cache.refresh(to_key, self) { event.track }
           publish(event.name, event.data)
@@ -34,7 +34,7 @@ module Jouba
       end
 
       def replay(event)
-        send __callback_method__(:"#{event.name}"), *event.data
+        send __callback_method__(:"#{event.name}"), event.data
       end
       alias_method :apply_event, :replay
 

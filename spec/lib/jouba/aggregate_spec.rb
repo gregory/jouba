@@ -33,13 +33,13 @@ describe Jouba::Aggregate do
     end
   end
 
-  describe '#emit(name, *args)' do
+  describe '#emit(name, data)' do
     after { target.create(attributes) }
 
     before do
       expect(Jouba.Event).to receive(:new)
-        .with(key: target.to_key, name: name, data: [attributes]).and_return(event)
-      expect(target).to receive(:"on_#{name}").with(*attributes)
+        .with(key: target.to_key, name: name, data: attributes).and_return(event)
+      expect(target).to receive(:"on_#{name}").with(attributes)
     end
 
     it 'apply the event' do
@@ -68,7 +68,7 @@ describe Jouba::Aggregate do
   describe '#replay(event)' do
     after { target.replay(event) }
     it 'calls the callback_method with the right params' do
-      expect(target).to receive(:"on_#{name}").with(*attributes)
+      expect(target).to receive(:"on_#{name}").with(attributes)
     end
   end
 
@@ -109,6 +109,32 @@ describe Jouba::Aggregate do
 
     it 'delegates to the configured key structure' do
       expect(Jouba.Key).to receive(:serialize).with(target_class.name, uuid)
+    end
+  end
+
+  describe '#5 dont splat the emit args' do
+    before do
+      @original_data = Object.new
+
+      target.define_singleton_method(:on_splat_removed) { |_| }
+      target.on(:splat_removed) { |data| @event_data = data }
+      target.emit(:splat_removed, @original_data)
+    end
+
+    it 'does not change emitted data' do
+      expect(@event_data).to eq @original_data
+      expect(@event_data).to_not be_an_instance_of(Array)
+    end
+
+    context 'when we emit with more than one argument' do
+      before do
+        target.define_singleton_method(:remove_splat) do |data, another_args|
+          emit(:splat_removed, data, another_args)
+        end
+      end
+      it 'fails with ArgumentError' do
+        expect { target.remove_splat('some data', 'other data') }.to raise_error(ArgumentError)
+      end
     end
   end
 end
