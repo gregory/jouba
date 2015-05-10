@@ -11,7 +11,6 @@ describe Jouba::Aggregate do
   let(:target_class) do
     Class.new(OpenStruct) do
       include Jouba::Aggregate.new(prefix: :on)
-      include Wisper::Publisher
 
       def create(attributes)
         emit(:created, attributes)
