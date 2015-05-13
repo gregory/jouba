@@ -1,9 +1,11 @@
 # Jouba
 
 [![Join the chat at https://gitter.im/gregory/jouba](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gregory/jouba?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Dependency Status](https://gemnasium.com/gregory/jouba.svg)](https://gemnasium.com/gregory/jouba)
+[![Build](https://travis-ci.org/gregory/jouba.png?branch=master)](https://travis-ci.org/gregory/jouba)
+[![Coverage](https://coveralls.io/repos/gregory/jouba/badge.svg?branch=master)](https://coveralls.io/r/gregory/jouba?branch=master)
 
 ![](https://dl.dropboxusercontent.com/u/19927862/jouba.png)
-
 
 ## WTF?
 
@@ -14,20 +16,17 @@ Jouba aims to be a minimalist framework in pure ruby for [event sourcing](http:/
 **Event sourcing**:
 > The fundamental idea of Event Sourcing is that of ensuring every change to the state of an application is captured in an event object, and that these event objects are themselves stored in the sequence they were applied for the same lifetime as the application state itself.
 
-
-**CQRS**: 
+**CQRS**:
 > It's a pattern that I first heard described by Greg Young. At its heart is a simple notion that you can use a different model to update information than the model you use to read information.
 
 ## FAQ:
 
 * Is it in production yet?
   * Not that i know of. In my case, not yet since i've been pretty busy with other stuffs and this was initially part of a side project, but i should be pretty reactive for PR/issues so feel free to use/improve it.
-  
-  
 
 ## Pub/Sub
 
-Jouba ships with a minimalist API to emit events and subscribe listeners (listeners could operate asynchronously) and retrieve events from the store that is set at `Jouba.config.Store` (by default this will be an [in memory store](https://github.com/gregory/jouba/blob/master/lib/jouba/store.rb#L47). 
+Jouba ships with a minimalist API to emit events and subscribe listeners (listeners could operate asynchronously) and retrieve events from the store that is set at `Jouba.config.Store` (by default this will be an [in memory store](https://github.com/gregory/jouba/blob/master/lib/jouba/store.rb#L47).
 
 At it's core, it relies on the excellent [wisper](https://github.com/krisleech/wisper) gem so you have all it's awesomeness for free.
 
@@ -38,7 +37,7 @@ Jouba.subscribe(Logger.new, on: /.*/, with: :log)
 Jouba.subscribe(Graphite, on: /us.*/, with: :post, async: true).on_error do |error, name,payload|
 	#DO SOMETHING
 end
-	
+
 Jouba.stream('us.computer1.cpu').since(1.month.ago).where({value: ->(v) { v >= 20 }})
 
 class Logger
@@ -58,12 +57,11 @@ end
 
 You are free to implement an Event Store as soon as they define `self.stream`and `self.track` methods.
 
-
 ```ruby
 
   class Store < ActiveRecord::Base
     set_table_name :events
- 
+
     scope :since, -> (time) { where('timestamp >= ?', time) }
 
     def self.stream(key, params={})
@@ -74,7 +72,6 @@ You are free to implement an Event Store as soon as they define `self.stream`and
       create serialized_event
     end
   end
-  
 
   Jouba.config.Store = Store
   Jouba.emit('us.computer1', :disk, {value: 60})
@@ -103,7 +100,7 @@ A UUID will be generated for any new aggregate, [even in distributed environment
 require 'jouba/aggregate'
 class Customer < Hashie::Dash
   include Jouba::Aggregate.new(prefix: :on)
-  
+
   property :uuid
   property :name
 
@@ -144,7 +141,7 @@ Event Sourcing might seem overkill, but this is a little cost comparing to [the 
 
 ## Event (indicate that something has happened)
 
-If you are unhappy with the structure of Jouba::Event, feel free to implement your own! 
+If you are unhappy with the structure of Jouba::Event, feel free to implement your own!
 
 You can access/update to the main parts of jouba from the config
 
@@ -162,26 +159,25 @@ Jouba.config.Event = MyEvent
 
 ## Event Key (generate a key based on the aggregate)
 
-If you feels unhappy with the way Jouba::Key is building keys in the aggregate, feel free to implement your own! 
-
+If you feels unhappy with the way Jouba::Key is building keys in the aggregate, feel free to implement your own!
 
 ```ruby
-	
+
 class MyKey
   attr_reader :class_name, :uuid
-	  
+
   def initialize(class_name, uuid);
     @class_name, @uuid = class_name, uuid
   end
-	  
+
   def self.serialize(class_name, uuid); end #return a string of a key
   def self.deserialize(string); end # return a new MyKey
 end
 ```
 
-## Repository 
+## Repository
 
-Repository is a CQRS concept where you should use repositories to fetch your data for read only. You'll need to keep your repository up to date with all the latest changes. 
+Repository is a CQRS concept where you should use repositories to fetch your data for read only. You'll need to keep your repository up to date with all the latest changes.
 The way to achieve this with jouba is by having the repository to subscribe to the aggregates. Repository will ideally translate events into state.
 
 ```ruby
@@ -219,11 +215,10 @@ The way to achieve this with jouba is by having the repository to subscribe to t
 
 ## Cache
 
-If you feels unhappy with Jouba::Cache, feel free to implement your own! 
-
+If you feels unhappy with Jouba::Cache, feel free to implement your own!
 
 ```ruby
-	
+
 class MyCache
   def fetch(_)
     yield
@@ -236,11 +231,11 @@ end
 
 Jouba.config.Cache = MyCache.new
 ```
-## Why Jouba? 
+## Why Jouba?
 
 Jouba is the name of the parrot i grew up with. He never talked but made a hell lot of noise. Going down the path of event sourcing, you'll have a lot of noise first, but then you'll figure out what to do with it.
 
-## TODO: 
+## TODO:
 
 * [ ] Better doc (this is a draft :))
 * [ ] Locking Mechanisme
