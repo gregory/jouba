@@ -1,0 +1,20 @@
+language: ruby
+sudo: false
+cache: bundler
+
+rvm:
+  - jruby-head
+  - ruby-head
+  - rbx-2.2.10
+  - 2.1.5
+  - 2.0.0
+  - 1.9.3
+
+matrix:
+  allow_failures:
+    - rvm: ruby-head
+    - rvm: jruby-head
+
+addons:
+  code_climate:
+    repo_token: 74cfba4ad81099911b0f3d0ae827d17c2eec7ce3198220cd85d708d9e0a35c32
