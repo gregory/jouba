@@ -33,7 +33,7 @@ describe Jouba::Aggregate do
     end
   end
 
-  describe '#emit(name, *args)' do
+  describe '#emit(name, args)' do
     after { target.create(attributes) }
 
     before do
@@ -109,21 +109,6 @@ describe Jouba::Aggregate do
 
     it 'delegates to the configured key structure' do
       expect(Jouba.Key).to receive(:serialize).with(target_class.name, uuid)
-    end
-  end
-
-  describe 'PR[5] Remove Arrayification of Event\'s data' do
-    before do
-      @original_data = Object.new
-
-      target.define_singleton_method(:on_remove_arrayification){|_| }
-      target.on(:remove_arrayification) { |data| @event_data = data }
-      target.emit(:remove_arrayification, @original_data)
-    end
-
-    it 'does not change emitted data' do
-      expect(@event_data).to eq @original_data
-      expect(@event_data).to_not be_an_instance_of(Array)
     end
   end
 end
