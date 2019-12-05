@@ -7,7 +7,7 @@
 
 ![](https://dl.dropboxusercontent.com/u/19927862/jouba.png)
 
-## WTF?
+## Context
 
 Jouba aims to be a minimalist framework in pure ruby for [event sourcing](http://martinfowler.com/eaaDev/EventSourcing.html), [CQRS](http://martinfowler.com/bliki/CQRS.html) ready.
 
